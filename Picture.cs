@@ -22,6 +22,7 @@ namespace APO_Projekt
 		private HistListForm histogramListDisplay = null;
 
 		private Dictionary<string, int[]> histogram; // 3 histograms: red, green, blue
+		private History history = new History();
 
 		private bool isGreyscale = false;
 		private bool isModified = false;
@@ -151,6 +152,7 @@ namespace APO_Projekt
 				}
 			}
 			MakeChanges(newImg);
+			ApproveChanges();
 		}
 
 		public void EqualizeHistogram()
@@ -170,6 +172,7 @@ namespace APO_Projekt
 				}
 			}
 			MakeChanges(newImg);
+			ApproveChanges();
 		}
 
 		public void Negation()
@@ -185,6 +188,7 @@ namespace APO_Projekt
 				}
 			}
 			MakeChanges(newImg);
+			ApproveChanges();
 		}
 
 		public static Picture BitwiseAND(Picture picture1, Picture picture2)
@@ -311,6 +315,7 @@ namespace APO_Projekt
 			Image<Gray, Byte> newImg = new Image<Gray, byte>(imgCV.Size);
 			CvInvoke.Threshold(imgCV, newImg, 0, 255, Emgu.CV.CvEnum.ThresholdType.Otsu);
 			MakeChanges(newImg.ToBitmap());
+			ApproveChanges();
 		}
 		
 		public void Blur(int size)
@@ -336,6 +341,7 @@ namespace APO_Projekt
 			Image<Bgr, double> newImg = new Image<Bgr, double>(imgCV.Size);
 			CvInvoke.Laplacian(imgCV, newImg, Emgu.CV.CvEnum.DepthType.Cv64F);
 			MakeChanges(newImg.ToBitmap());
+			ApproveChanges();
 		}
 
 		public void Sobel(int xorder, int yorder)
@@ -344,6 +350,7 @@ namespace APO_Projekt
 			Image<Bgr, double> newImg = new Image<Bgr, double>(imgCV.Size);
 			CvInvoke.Sobel(imgCV, newImg, Emgu.CV.CvEnum.DepthType.Cv64F, xorder, yorder);
 			MakeChanges(newImg.ToBitmap());
+			ApproveChanges();
 		}
 
 		public void Canny(double threshold1, double threshold2)
@@ -352,6 +359,7 @@ namespace APO_Projekt
 			Image<Gray, Byte> newImg = new Image<Gray, byte>(imgCV.Size);
 			CvInvoke.Canny(imgCV, newImg, threshold1, threshold2, 3, true);
 			MakeChanges(newImg.ToBitmap());
+			ApproveChanges();
 		}
 
 		public void MedianBlur(int filterSize)
@@ -437,8 +445,27 @@ namespace APO_Projekt
 			this.histogramListDisplay = new HistListForm(this);
 			this.histogramListDisplay.Show();
 		}
-		// Undos all made changes
 		public void Undo()
+		{
+			if(!history.UndoEmpty)
+			{
+				img = history.Undo(imgCopy);
+				imgCopy = new Bitmap(img);
+			}
+		}
+
+		public void Redo()
+		{
+			if(!history.RedoEmpty)
+			{
+				img = history.Redo(imgCopy);
+				imgCopy = new Bitmap(img);
+			}
+		}
+		/// <summary>
+		/// Undos all made changes.
+		/// </summary>
+		public void Revert()
 		{
 			this.img = new Bitmap(this.imgCopy);
 			this.histogram = CalculateHistogram();
@@ -452,7 +479,9 @@ namespace APO_Projekt
 				this.histogramDisplay.refresh();
 			}
 		}
-		//Executed when closing image window, closes all related windows
+		/// <summary>
+		/// Executed when closing image window, closes all related windows.
+		/// </summary>
 		public void Close()
 		{
 			if(this.histogramDisplay != null)
@@ -481,8 +510,10 @@ namespace APO_Projekt
 		{
 			this.histogramListDisplay = null;
 		}
-
-		//Saves changed image and refreshes all related windows
+		/// <summary>
+		/// Saves changed image and refreshes all related windows.
+		/// </summary>
+		/// <param name="newImg">Image to be saved.</param>
 		private void MakeChanges(Bitmap newImg)
 		{
 			this.img.Dispose();
@@ -505,6 +536,14 @@ namespace APO_Projekt
 				this.histogramListDisplay.refresh();
 			}
 			newImg.Dispose();
+		}
+		/// <summary>
+		/// Approves changes made to image, so you can make different changes to it, as well as to use undo operation.
+		/// </summary>
+		public void ApproveChanges()
+		{
+			history.Add(this.imgCopy);
+			this.imgCopy = new Bitmap(this.img);
 		}
 		private string CreateNewFilename(string path)
 		{
@@ -798,6 +837,7 @@ namespace APO_Projekt
 				}
 			}
 			MakeChanges(NewImg);
+			ApproveChanges();
 		}
 
 		// Getters

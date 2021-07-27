@@ -84,6 +84,7 @@
     <Compile Include="HistListForm.Designer.cs">
       <DependentUpon>HistListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="History.cs" />
     <Compile Include="LogicDialog.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -23,14 +23,21 @@ namespace APO_Projekt
 
 		private void btOK_Click(object sender, EventArgs e)
 		{
-			LogicWindowType win = (LogicWindowType)cbSurrounding.SelectedItem;
-			handle.LogicFiltration(win);
+			handle.ApproveChanges();
 			this.DialogResult = DialogResult.OK;
 		}
 
 		private void btCancel_Click(object sender, EventArgs e)
 		{
+			handle.Revert();
 			this.DialogResult = DialogResult.Cancel;
+		}
+
+		private void cbSurrounding_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			handle.Revert();
+			LogicWindowType win = (LogicWindowType)cbSurrounding.SelectedItem;
+			handle.LogicFiltration(win);
 		}
 	}
 }

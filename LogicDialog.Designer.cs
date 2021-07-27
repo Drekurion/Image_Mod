@@ -46,6 +46,7 @@ namespace APO_Projekt
 			this.cbSurrounding.Name = "cbSurrounding";
 			this.cbSurrounding.Size = new System.Drawing.Size(121, 21);
 			this.cbSurrounding.TabIndex = 1;
+			this.cbSurrounding.SelectedIndexChanged += new System.EventHandler(this.cbSurrounding_SelectedIndexChanged);
 			// 
 			// label2
 			// 

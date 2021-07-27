@@ -114,7 +114,7 @@ namespace APO_Projekt
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			undoToolStripMenuItem.Enabled = false;
 		}
 
@@ -335,6 +335,7 @@ namespace APO_Projekt
 			if(dlg.ShowDialog() == DialogResult.OK)
 			{
 				PictureList.Focused.Filtration(dlg.kernel);
+				PictureList.Focused.ApproveChanges();
 				undoToolStripMenuItem.Enabled = true;
 			}
 		}

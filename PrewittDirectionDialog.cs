@@ -33,7 +33,7 @@ namespace APO_Projekt
 
 		private void btNW_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,] 
 			{
 				{ 1, 1, 1 },
@@ -45,7 +45,7 @@ namespace APO_Projekt
 		}
 		private void btN_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ 1, 1, 1 },
@@ -57,7 +57,7 @@ namespace APO_Projekt
 		}
 		private void btNE_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ 1, 1, 1 },
@@ -70,7 +70,7 @@ namespace APO_Projekt
 
 		private void btW_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ 1, 1, -1 },
@@ -83,7 +83,7 @@ namespace APO_Projekt
 
 		private void btE_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ -1, 1, 1 },
@@ -96,7 +96,7 @@ namespace APO_Projekt
 
 		private void btSW_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ 1, -1, -1 },
@@ -109,7 +109,7 @@ namespace APO_Projekt
 
 		private void btS_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ -1, -1, -1},
@@ -122,7 +122,7 @@ namespace APO_Projekt
 
 		private void btSE_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			kernel = new Emgu.CV.Matrix<int>(new int[,]
 			{
 				{ -1, -1, 1 },
@@ -135,12 +135,13 @@ namespace APO_Projekt
 
 		private void btOK_Click(object sender, EventArgs e)
 		{
+			PictureList.Focused.ApproveChanges();
 			this.DialogResult = DialogResult.OK;
 		}
 
 		private void btCancel_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			this.DialogResult = DialogResult.Cancel;
 		}
 	}

@@ -52,19 +52,20 @@ namespace APO_Projekt
 		{
 			if(!isLoading)
 			{
-				PictureList.Focused.Undo();
+				PictureList.Focused.Revert();
 				PictureList.Focused.Morphology(operations[cbOperation.SelectedItem.ToString()], shapes[cbShape.SelectedItem.ToString()], borderTypes[cbBorderType.SelectedItem.ToString()], int.Parse(cbSize.SelectedItem.ToString()));
 			}
 		}
 
 		private void btOK_Click(object sender, EventArgs e)
 		{
+			PictureList.Focused.ApproveChanges();
 			this.DialogResult = DialogResult.OK;
 		}
 
 		private void btCancel_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			this.DialogResult = DialogResult.Cancel;
 		}
 

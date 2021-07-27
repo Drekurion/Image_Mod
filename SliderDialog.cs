@@ -31,12 +31,13 @@ namespace APO_Projekt
 
 		private void btOK_Click(object sender, EventArgs e)
 		{
+			PictureList.Focused.ApproveChanges();
 			this.DialogResult = DialogResult.OK;
 		}
 
 		private void btCancel_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			this.DialogResult = DialogResult.Cancel;
 		}
 
@@ -54,7 +55,7 @@ namespace APO_Projekt
 		private void tbThreshold_MouseUp(object sender, MouseEventArgs e)
 		{
 			this.threshold = tbThreshold.Value;
-			PictureList.Focused.Undo();
+			PictureList.Focused.Revert();
 			if(type == SliderDialogType.AdaptiveThreshold)
 			{
 				PictureList.Focused.AdaptiveThresholding(threshold);
