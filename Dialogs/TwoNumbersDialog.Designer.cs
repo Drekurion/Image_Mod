@@ -83,7 +83,7 @@ namespace APO_Projekt
 			// btCancel
 			// 
 			this.btCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btCancel.Location = new System.Drawing.Point(130, 90);
+			this.btCancel.Location = new System.Drawing.Point(175, 90);
 			this.btCancel.Name = "btCancel";
 			this.btCancel.Size = new System.Drawing.Size(75, 23);
 			this.btCancel.TabIndex = 5;
@@ -95,7 +95,7 @@ namespace APO_Projekt
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(217, 125);
+			this.ClientSize = new System.Drawing.Size(262, 125);
 			this.Controls.Add(this.btCancel);
 			this.Controls.Add(this.btOK);
 			this.Controls.Add(this.label2);
@@ -103,8 +103,11 @@ namespace APO_Projekt
 			this.Controls.Add(this.tbMax);
 			this.Controls.Add(this.tbMin);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "TwoNumbersDialog";
-			this.Text = "TwoNumbersDialog";
+			this.ShowIcon = false;
+			this.Text = "Select minimum and maximum value:";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

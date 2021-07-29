@@ -169,8 +169,11 @@ namespace APO_Projekt
 			this.Controls.Add(this.btCancel);
 			this.Controls.Add(this.btOK);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "PrewittDirectionDialog";
-			this.Text = "PrewittDirectionDialog";
+			this.ShowIcon = false;
+			this.Text = "Select Prewitt direction:";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

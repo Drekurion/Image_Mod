@@ -151,8 +151,11 @@ namespace APO_Projekt
 			this.Controls.Add(this.cbShape);
 			this.Controls.Add(this.cbBorderType);
 			this.Controls.Add(this.cbOperation);
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "MorphologyDialog";
-			this.Text = "MorfologyDialog";
+			this.ShowIcon = false;
+			this.Text = "Morfology";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
