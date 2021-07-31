@@ -269,35 +269,60 @@ namespace APO_Projekt
 			return new Picture(newImg, picture1.Path);
 		}
 
-		public void Threshold(int[] thresholds, int[] values)
+		public void Thresholding(int threshold)
 		{
-			if (thresholds.Length != values.Length) throw new ArgumentException();
-			Image<Gray, byte> image = Img.ToImage<Gray, Byte>();
-			Gray th = new Gray(128);
-			for(int x = 0; x < image.Height; ++x)
+			byte r, g, b;
+			Bitmap newImg = new Bitmap(Img.Width, Img.Height);
+			for (int x = 0; x < Img.Width; ++x)
 			{
-				for(int y = 0; y < image.Width; ++y)
+				for (int y = 0; y < Img.Height; ++y)
 				{
-					Gray value = new Gray(255);
-					Gray pixel = image[x, y];
-					for(int i = thresholds.Length - 1; i >= 0; --i)
-					{
-						if (pixel.Intensity <= thresholds[i])
-						{
-							if(values[i] < 0)
-							{
-								value.Intensity = pixel.Intensity;
-							}
-							else
-							{
-								value.Intensity = values[i];
-							}
-						}
-					}
-					image[x, y] = value;
+					r = 0;
+					g = 0;
+					b = 0;
+					Color pixel = Img.GetPixel(x, y);
+					if (pixel.R > threshold) r = 255;
+					if (pixel.G > threshold) g = 255;
+					if (pixel.B > threshold) b = 255;
+					Color newpixel = Color.FromArgb(r, g, b);
+					newImg.SetPixel(x, y, newpixel);
 				}
 			}
-			MakeChanges(image.ToBitmap());
+			MakeChanges(newImg);
+		}
+
+		public void Posterize(int numberOfBins)
+		{
+			int step = (int)Math.Ceiling((decimal)255 / numberOfBins);
+			int[] bins = new int[numberOfBins];
+			for (int i = 0; i < numberOfBins; ++i)
+			{
+				bins[i] = i * step;
+			}
+			Bitmap newImg = new Bitmap(Img.Width, Img.Height);
+			for (int x = 0; x < Img.Width; ++x)
+			{
+				for (int y = 0; y < Img.Height; ++y)
+				{
+					int r = 0;
+					int g = 0;
+					int b = 0;
+					Color pixel = Img.GetPixel(x, y);
+					int i = 0;
+					for (; i < bins.Length - 1; ++i)
+					{
+						if (pixel.R > bins[i]) r = bins[i];
+						if (pixel.G > bins[i]) g = bins[i];
+						if (pixel.B > bins[i]) b = bins[i];
+					}
+					if (pixel.R > bins[i]) r = 255;
+					if (pixel.G > bins[i]) g = 255;
+					if (pixel.B > bins[i]) b = 255;
+					Color newpixel = Color.FromArgb(r, g, b);
+					newImg.SetPixel(x, y, newpixel);
+				}
+			}
+			MakeChanges(newImg);
 		}
 
 		public void AdaptiveThresholding(int size)

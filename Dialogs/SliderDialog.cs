@@ -12,21 +12,44 @@ namespace APO_Projekt
 {
 	public partial class SliderDialog : Form
 	{
-		private int[] values = new int[]{ 0, 255 };
 		private int threshold;
-		SliderDialogType type;
+		private readonly SliderDialogType type;
 		private int prev = 3;
 		public SliderDialog(SliderDialogType type)
 		{
 			InitializeComponent();
 			this.threshold = new int();
 			this.type = type;
-
-			tbThreshold.Value = 3;
-			tbThreshold.Minimum = 3;
-			tbThreshold.Maximum = 255;
-			tbThreshold.TickFrequency = 2;
-			tbThreshold.SmallChange = 2;
+			switch(type)
+			{
+				case SliderDialogType.Threshold:
+					{
+						tbThreshold.Minimum = 0;
+						tbThreshold.Maximum = 255;
+						tbThreshold.Value = 0;
+						tbThreshold.TickFrequency = 1;
+						tbThreshold.SmallChange = 2;
+						break;
+					}
+				case SliderDialogType.Posterize:
+					{
+						tbThreshold.Minimum = 1;
+						tbThreshold.Maximum = 16;
+						tbThreshold.Value = 1;
+						tbThreshold.TickFrequency = 1;
+						tbThreshold.SmallChange = 2;
+						break;
+					}
+				default:
+					{
+						tbThreshold.Minimum = 3;
+						tbThreshold.Maximum = 255;
+						tbThreshold.Value = 3;
+						tbThreshold.TickFrequency = 2;
+						tbThreshold.SmallChange = 2;
+						break;
+					}
+			}
 		}
 
 		private void btOK_Click(object sender, EventArgs e)
@@ -43,12 +66,22 @@ namespace APO_Projekt
 
 		private void tbThreshold_Scroll(object sender, EventArgs e)
 		{
-			if(tbThreshold.Value % 2 == 0)
+			switch(type)
 			{
-				if (prev < tbThreshold.Value) tbThreshold.Value++;
-				else if (prev > tbThreshold.Value) tbThreshold.Value--;
+				// Preventing setting an even number.
+				case SliderDialogType.GaussBlur:
+				case SliderDialogType.AdaptiveThreshold:
+				case SliderDialogType.MedianBlur:
+					{
+						if(tbThreshold.Value % 2 == 0)
+						{
+							if (prev < tbThreshold.Value) tbThreshold.Value++;
+							else if (prev > tbThreshold.Value) tbThreshold.Value--;
+						}
+						prev = tbThreshold.Value;
+						break;
+					}
 			}
-			prev = tbThreshold.Value;
 			txtDisplay.Text = tbThreshold.Value.ToString();
 		}
 
@@ -56,21 +89,38 @@ namespace APO_Projekt
 		{
 			this.threshold = tbThreshold.Value;
 			PictureList.Focused.Revert();
-			if(type == SliderDialogType.AdaptiveThreshold)
+			switch(type)
 			{
-				PictureList.Focused.AdaptiveThresholding(threshold);
-			}
-			if(type == SliderDialogType.MedianBlur)
-			{
-				PictureList.Focused.MedianBlur(threshold);
-			}
-			if(type == SliderDialogType.Blur)
-			{
-				PictureList.Focused.Blur(threshold);
-			}
-			if(type == SliderDialogType.GaussBlur)
-			{
-				PictureList.Focused.GaussianBlur(threshold);
+				case SliderDialogType.Blur:
+					{
+						PictureList.Focused.Blur(threshold);
+						break;
+					}
+				case SliderDialogType.GaussBlur:
+					{
+						PictureList.Focused.GaussianBlur(threshold);
+						break;
+					}
+				case SliderDialogType.Threshold:
+					{
+						PictureList.Focused.Thresholding(threshold);
+						break;
+					}
+				case SliderDialogType.AdaptiveThreshold:
+					{
+						PictureList.Focused.AdaptiveThresholding(threshold);
+						break;
+					}
+				case SliderDialogType.Posterize:
+					{
+						PictureList.Focused.Posterize(threshold);
+						break;
+					}
+				case SliderDialogType.MedianBlur:
+					{
+						PictureList.Focused.MedianBlur(threshold);
+						break;
+					}
 			}
 		}
 

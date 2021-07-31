@@ -75,6 +75,7 @@ namespace APO_Projekt
 			this.watershedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.analizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.informacjaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.posterizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -235,6 +236,7 @@ namespace APO_Projekt
 			this.pointOperationsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.negationToolStripMenuItem,
             this.thresholdingToolStripMenuItem,
+            this.posterizeToolStripMenuItem,
             this.thresholdingAdaptiveToolStripMenuItem,
             this.thresholdingOtsuToolStripMenuItem,
             this.toolStripMenuItem7,
@@ -251,73 +253,73 @@ namespace APO_Projekt
 			// negationToolStripMenuItem
 			// 
 			this.negationToolStripMenuItem.Name = "negationToolStripMenuItem";
-			this.negationToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.negationToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.negationToolStripMenuItem.Text = "Negacja";
 			this.negationToolStripMenuItem.Click += new System.EventHandler(this.negationToolStripMenuItem_Click);
 			// 
 			// thresholdingToolStripMenuItem
 			// 
 			this.thresholdingToolStripMenuItem.Name = "thresholdingToolStripMenuItem";
-			this.thresholdingToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
-			this.thresholdingToolStripMenuItem.Text = "Progowanie / Posteryzacja";
+			this.thresholdingToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+			this.thresholdingToolStripMenuItem.Text = "Progowanie";
 			this.thresholdingToolStripMenuItem.Click += new System.EventHandler(this.thresholdingToolStripMenuItem_Click);
 			// 
 			// thresholdingAdaptiveToolStripMenuItem
 			// 
 			this.thresholdingAdaptiveToolStripMenuItem.Name = "thresholdingAdaptiveToolStripMenuItem";
-			this.thresholdingAdaptiveToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.thresholdingAdaptiveToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.thresholdingAdaptiveToolStripMenuItem.Text = "Progowanie adaptacyjne";
 			this.thresholdingAdaptiveToolStripMenuItem.Click += new System.EventHandler(this.thresholdingAdaptiveToolStripMenuItem_Click);
 			// 
 			// thresholdingOtsuToolStripMenuItem
 			// 
 			this.thresholdingOtsuToolStripMenuItem.Name = "thresholdingOtsuToolStripMenuItem";
-			this.thresholdingOtsuToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.thresholdingOtsuToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.thresholdingOtsuToolStripMenuItem.Text = "Progowanie Otsu";
 			this.thresholdingOtsuToolStripMenuItem.Click += new System.EventHandler(this.thresholdingOtsuToolStripMenuItem_Click);
 			// 
 			// toolStripMenuItem7
 			// 
 			this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-			this.toolStripMenuItem7.Size = new System.Drawing.Size(210, 6);
+			this.toolStripMenuItem7.Size = new System.Drawing.Size(201, 6);
 			// 
 			// addingPicturesToolStripMenuItem
 			// 
 			this.addingPicturesToolStripMenuItem.Name = "addingPicturesToolStripMenuItem";
-			this.addingPicturesToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.addingPicturesToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.addingPicturesToolStripMenuItem.Text = "Dodawanie";
 			this.addingPicturesToolStripMenuItem.Click += new System.EventHandler(this.addingPicturesToolStripMenuItem_Click);
 			// 
 			// substractingPicturesToolStripMenuItem
 			// 
 			this.substractingPicturesToolStripMenuItem.Name = "substractingPicturesToolStripMenuItem";
-			this.substractingPicturesToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.substractingPicturesToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.substractingPicturesToolStripMenuItem.Text = "Odejmowanie";
 			this.substractingPicturesToolStripMenuItem.Click += new System.EventHandler(this.substractingPicturesToolStripMenuItem_Click);
 			// 
 			// toolStripMenuItem8
 			// 
 			this.toolStripMenuItem8.Name = "toolStripMenuItem8";
-			this.toolStripMenuItem8.Size = new System.Drawing.Size(210, 6);
+			this.toolStripMenuItem8.Size = new System.Drawing.Size(201, 6);
 			// 
 			// bitwiseANDToolStripMenuItem
 			// 
 			this.bitwiseANDToolStripMenuItem.Name = "bitwiseANDToolStripMenuItem";
-			this.bitwiseANDToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.bitwiseANDToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.bitwiseANDToolStripMenuItem.Text = "And";
 			this.bitwiseANDToolStripMenuItem.Click += new System.EventHandler(this.bitwiseANDToolStripMenuItem_Click);
 			// 
 			// bitwiseORToolStripMenuItem
 			// 
 			this.bitwiseORToolStripMenuItem.Name = "bitwiseORToolStripMenuItem";
-			this.bitwiseORToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.bitwiseORToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.bitwiseORToolStripMenuItem.Text = "Or";
 			this.bitwiseORToolStripMenuItem.Click += new System.EventHandler(this.bitwiseORToolStripMenuItem_Click);
 			// 
 			// bitwiseXORToolStripMenuItem
 			// 
 			this.bitwiseXORToolStripMenuItem.Name = "bitwiseXORToolStripMenuItem";
-			this.bitwiseXORToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+			this.bitwiseXORToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.bitwiseXORToolStripMenuItem.Text = "Xor";
 			this.bitwiseXORToolStripMenuItem.Click += new System.EventHandler(this.bitwiseXORToolStripMenuItem_Click);
 			// 
@@ -454,6 +456,13 @@ namespace APO_Projekt
 			this.informacjaToolStripMenuItem.Text = "Informacja";
 			this.informacjaToolStripMenuItem.Click += new System.EventHandler(this.informacjaToolStripMenuItem_Click);
 			// 
+			// posterizeToolStripMenuItem
+			// 
+			this.posterizeToolStripMenuItem.Name = "posterizeToolStripMenuItem";
+			this.posterizeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+			this.posterizeToolStripMenuItem.Text = "Posteryzacja";
+			this.posterizeToolStripMenuItem.Click += new System.EventHandler(this.posterizeToolStripMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -522,6 +531,7 @@ namespace APO_Projekt
 		private System.Windows.Forms.ToolStripMenuItem analizeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem logicFiltrationToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem recoverFragmentToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem posterizeToolStripMenuItem;
 	}
 }
 

@@ -126,12 +126,6 @@
       <DependentUpon>SliderDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Emums.cs" />
-    <Compile Include="Dialogs\ThresholdDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ThresholdDialog.Designer.cs">
-      <DependentUpon>ThresholdDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\TwoNumbersDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -182,9 +176,6 @@
     </Compile>
     <EmbeddedResource Include="Dialogs\SliderDialog.resx">
       <DependentUpon>SliderDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ThresholdDialog.resx">
-      <DependentUpon>ThresholdDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TwoNumbersDialog.resx">
       <DependentUpon>TwoNumbersDialog.cs</DependentUpon>

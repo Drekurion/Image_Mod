@@ -10,7 +10,9 @@ namespace APO_Projekt
 	{
 		Blur,
 		GaussBlur,
+		Threshold,
 		AdaptiveThreshold,
+		Posterize,
 		MedianBlur
 	}
 	public enum DataTableDialogType

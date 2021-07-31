@@ -71,10 +71,9 @@ namespace APO_Projekt
 						Picture picture = new Picture(bitmap, filename);
 						PictureList.All.Add(picture.Path, picture);
 						bitmap.Dispose();
-						picture = null;
 					}
 				}
-
+				MainForm_Activated(null, null);
 			}
 		}
 
@@ -92,7 +91,6 @@ namespace APO_Projekt
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SaveFileDialog dlg = new SaveFileDialog();
-			ImageFormat format = ImageFormat.Bmp;
 			dlg.Title = "Save Image As...";
 			dlg.DefaultExt = ".bmp";
 			dlg.Filter = "Bitmap Image (*.bmp)|*.bmp|Gif Image (*.gif)|*.gif|JPEG Image (*.jpeg)|*.jpeg|Png Image (*.png)|*.png|Tiff Image (*.tiff)|*.tiff";
@@ -124,7 +122,6 @@ namespace APO_Projekt
 			Picture picture = new Picture(bitmap, PictureList.Focused.Path);
 			PictureList.All.Add(picture.Path, picture);
 			bitmap.Dispose();
-			picture = null;
 		}
 		#endregion View
 
@@ -162,8 +159,8 @@ namespace APO_Projekt
 
 		private void thresholdingToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			ThresholdDialog dlg = new ThresholdDialog();
-			if(dlg.ShowDialog() == DialogResult.OK)
+			SliderDialog dlg = new SliderDialog(SliderDialogType.Threshold);
+			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				undoToolStripMenuItem.Enabled = true;
 			}
@@ -216,11 +213,6 @@ namespace APO_Projekt
 					MessageBox.Show(x.Message, "Error", MessageBoxButtons.OK);
 				}
 			}
-		}
-
-		private void blendingPicturesToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-
 		}
 
 		private void bitwiseANDToolStripMenuItem_Click(object sender, EventArgs e)
@@ -410,6 +402,15 @@ namespace APO_Projekt
 		private void recoverFragmentToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			TwoNumbersDialog dlg = new TwoNumbersDialog();
+			if (dlg.ShowDialog() == DialogResult.OK)
+			{
+				undoToolStripMenuItem.Enabled = true;
+			}
+		}
+
+		private void posterizeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SliderDialog dlg = new SliderDialog(SliderDialogType.Posterize);
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				undoToolStripMenuItem.Enabled = true;
