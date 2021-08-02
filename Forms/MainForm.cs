@@ -24,10 +24,6 @@ namespace APO_Projekt
 			{
 				saveToolStripMenuItem.Enabled = true;
 				saveAsToolStripMenuItem.Enabled = true;
-				if (PictureList.Focused.IsModified)
-				{
-					undoToolStripMenuItem.Enabled = true;
-				}
 				viewToolStripMenuItem.Enabled = true;
 				histogramToolStripMenuItem.Enabled = true;
 				pointOperationsToolStripMenuItem.Enabled = true;
@@ -36,7 +32,6 @@ namespace APO_Projekt
 			}
 			else
 			{
-				undoToolStripMenuItem.Enabled = false;
 				saveToolStripMenuItem.Enabled = false;
 				saveAsToolStripMenuItem.Enabled = false;
 				viewToolStripMenuItem.Enabled = false;
@@ -112,8 +107,11 @@ namespace APO_Projekt
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			PictureList.Focused.Revert();
-			undoToolStripMenuItem.Enabled = false;
+			PictureList.Focused.Undo();
+		}
+		private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			PictureList.Focused.Redo();
 		}
 
 		private void duplicateToolStripMenuItem_Click(object sender, EventArgs e)
@@ -139,21 +137,16 @@ namespace APO_Projekt
 		private void stretchHistogramToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.StretchHistogram();
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void equalizeHistogramToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.EqualizeHistogram();
-			undoToolStripMenuItem.Enabled = true;
 		}
 		private void recoverFragmentToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			TwoNumbersDialog dlg = new TwoNumbersDialog();
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 		#endregion Histogram
 
@@ -162,40 +155,29 @@ namespace APO_Projekt
 		private void negationToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.Negation();
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void thresholdingToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.Threshold);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 
 		private void posterizeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.Posterize);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 
 		private void thresholdingAdaptiveToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.AdaptiveThreshold);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 
 		private void thresholdingOtsuToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.OtsuThresholding();
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void addingPicturesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -289,53 +271,38 @@ namespace APO_Projekt
 		private void blurToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.Blur);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 
 		private void blurGaussianToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.GaussBlur);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 		private void blurMedianToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.MedianBlur);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 		private void sobelToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.Sobel(1, 0);
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void laplaceToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.Laplacian();
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void cannyToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.Canny(100, 200);
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void prewittToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PrewittDirectionDialog dlg = new PrewittDirectionDialog();
-			if(dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 
 		private void maskToolStripMenuItem_Click(object sender, EventArgs e)
@@ -345,68 +312,38 @@ namespace APO_Projekt
 			{
 				PictureList.Focused.Filtration(dlg.kernel);
 				PictureList.Focused.ApproveChanges();
-				undoToolStripMenuItem.Enabled = true;
 			}
 		}
 		private void logicFiltrationToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			LogicDialog dlg = new LogicDialog(PictureList.Focused);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			dlg.ShowDialog();
 		}
 		#endregion Neighbor Operations
 
 		#region Morfology
+
 		private void showMorfologyDialogToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			MorphologyDialog dlg = new MorphologyDialog();
-			if(dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
-		}
-
-		private void filtration1StepToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Emgu.CV.Matrix<float> kernel = new Emgu.CV.Matrix<float>(new float[]
-			{
-				1f,-1f,0f,-1f,1f,
-				-1f,1f,0f,1f,-1f,
-				0f,0f,0f,0f,0f,
-				-1f,1f,0f,1f,-1f,
-				1f,-1f,0f,-1f,1f,
-			});
-			PictureList.Focused.Filtration(kernel);
-			undoToolStripMenuItem.Enabled = true;
-		}
-
-		private void filtration2StepToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			Emgu.CV.Matrix<float> kernel1 = new Emgu.CV.Matrix<float>(new float[]{ 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f });
-			Emgu.CV.Matrix<float> kernel2 = new Emgu.CV.Matrix<float>(new float[] { 1f, -2f, 1f, -2f, 4f, -2f, 1f, -2f, 1f });
-			PictureList.Focused.Filtration(kernel1);
-			PictureList.Focused.Filtration(kernel2);
-			undoToolStripMenuItem.Enabled = true;
+			dlg.ShowDialog();
 		}
 
 		private void skeletizationToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.Skeletization();
-			undoToolStripMenuItem.Enabled = true;
 		}
 
 		private void watershedToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			PictureList.Focused.Watershed();
-			undoToolStripMenuItem.Enabled = true;
 		}
 		private void analizeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			AnalizeForm form = new AnalizeForm(PictureList.Focused);
 			form.Show();
 		}
+
 		#endregion Morfology
 
 		private void informacjaToolStripMenuItem_Click(object sender, EventArgs e)

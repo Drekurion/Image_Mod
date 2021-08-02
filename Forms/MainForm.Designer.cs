@@ -49,6 +49,7 @@ namespace APO_Projekt
 			this.pointOperationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.negationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.thresholdingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.posterizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.thresholdingAdaptiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.thresholdingOtsuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripSeparator();
@@ -75,7 +76,7 @@ namespace APO_Projekt
 			this.watershedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.analizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.informacjaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.posterizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -152,6 +153,7 @@ namespace APO_Projekt
 			// 
 			this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.undoToolStripMenuItem,
+            this.redoToolStripMenuItem,
             this.duplicateToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(53, 38);
@@ -162,7 +164,7 @@ namespace APO_Projekt
 			this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
 			this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
 			this.undoToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-			this.undoToolStripMenuItem.Text = "Cofnij";
+			this.undoToolStripMenuItem.Text = "Undo";
 			this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
 			// 
 			// duplicateToolStripMenuItem
@@ -263,6 +265,13 @@ namespace APO_Projekt
 			this.thresholdingToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
 			this.thresholdingToolStripMenuItem.Text = "Progowanie";
 			this.thresholdingToolStripMenuItem.Click += new System.EventHandler(this.thresholdingToolStripMenuItem_Click);
+			// 
+			// posterizeToolStripMenuItem
+			// 
+			this.posterizeToolStripMenuItem.Name = "posterizeToolStripMenuItem";
+			this.posterizeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
+			this.posterizeToolStripMenuItem.Text = "Posteryzacja";
+			this.posterizeToolStripMenuItem.Click += new System.EventHandler(this.posterizeToolStripMenuItem_Click);
 			// 
 			// thresholdingAdaptiveToolStripMenuItem
 			// 
@@ -456,12 +465,13 @@ namespace APO_Projekt
 			this.informacjaToolStripMenuItem.Text = "Informacja";
 			this.informacjaToolStripMenuItem.Click += new System.EventHandler(this.informacjaToolStripMenuItem_Click);
 			// 
-			// posterizeToolStripMenuItem
+			// redoToolStripMenuItem
 			// 
-			this.posterizeToolStripMenuItem.Name = "posterizeToolStripMenuItem";
-			this.posterizeToolStripMenuItem.Size = new System.Drawing.Size(204, 22);
-			this.posterizeToolStripMenuItem.Text = "Posteryzacja";
-			this.posterizeToolStripMenuItem.Click += new System.EventHandler(this.posterizeToolStripMenuItem_Click);
+			this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+			this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
+			this.redoToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+			this.redoToolStripMenuItem.Text = "Redo";
+			this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -532,6 +542,7 @@ namespace APO_Projekt
 		private System.Windows.Forms.ToolStripMenuItem logicFiltrationToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem recoverFragmentToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem posterizeToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
 	}
 }
 
