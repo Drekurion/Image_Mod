@@ -147,6 +147,14 @@ namespace APO_Projekt
 			PictureList.Focused.EqualizeHistogram();
 			undoToolStripMenuItem.Enabled = true;
 		}
+		private void recoverFragmentToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			TwoNumbersDialog dlg = new TwoNumbersDialog();
+			if (dlg.ShowDialog() == DialogResult.OK)
+			{
+				undoToolStripMenuItem.Enabled = true;
+			}
+		}
 		#endregion Histogram
 
 		#region Point Operations
@@ -160,6 +168,15 @@ namespace APO_Projekt
 		private void thresholdingToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			SliderDialog dlg = new SliderDialog(SliderDialogType.Threshold);
+			if (dlg.ShowDialog() == DialogResult.OK)
+			{
+				undoToolStripMenuItem.Enabled = true;
+			}
+		}
+
+		private void posterizeToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			SliderDialog dlg = new SliderDialog(SliderDialogType.Posterize);
 			if (dlg.ShowDialog() == DialogResult.OK)
 			{
 				undoToolStripMenuItem.Enabled = true;
@@ -331,6 +348,14 @@ namespace APO_Projekt
 				undoToolStripMenuItem.Enabled = true;
 			}
 		}
+		private void logicFiltrationToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			LogicDialog dlg = new LogicDialog(PictureList.Focused);
+			if (dlg.ShowDialog() == DialogResult.OK)
+			{
+				undoToolStripMenuItem.Enabled = true;
+			}
+		}
 		#endregion Neighbor Operations
 
 		#region Morfology
@@ -377,44 +402,16 @@ namespace APO_Projekt
 			PictureList.Focused.Watershed();
 			undoToolStripMenuItem.Enabled = true;
 		}
-		#endregion Morfology
-
-		private void informacjaToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			MessageBox.Show("Tytuł projektu:\nAutor: Dariusz Woźniak\nProwadzący:mgr inż. Łukasz Roszkowiak\nAlgorytmy Przetwarzania Obrazów 2021\nWIT grupa ID06IO2.", "Aplikacja zbiorcza z ćwiczeń laboratoryjnych i projektu.");
-		}
-
 		private void analizeToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			AnalizeForm form = new AnalizeForm(PictureList.Focused);
 			form.Show();
 		}
+		#endregion Morfology
 
-		private void logicFiltrationToolStripMenuItem_Click(object sender, EventArgs e)
+		private void informacjaToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			LogicDialog dlg = new LogicDialog(PictureList.Focused);
-			if(dlg.ShowDialog()== DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
-		}
-
-		private void recoverFragmentToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			TwoNumbersDialog dlg = new TwoNumbersDialog();
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
-		}
-
-		private void posterizeToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			SliderDialog dlg = new SliderDialog(SliderDialogType.Posterize);
-			if (dlg.ShowDialog() == DialogResult.OK)
-			{
-				undoToolStripMenuItem.Enabled = true;
-			}
+			MessageBox.Show("Tytuł projektu:\nAutor: Dariusz Woźniak\nProwadzący:mgr inż. Łukasz Roszkowiak\nAlgorytmy Przetwarzania Obrazów 2021\nWIT grupa ID06IO2.", "Aplikacja zbiorcza z ćwiczeń laboratoryjnych i projektu.");
 		}
 	}
 }

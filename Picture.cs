@@ -11,6 +11,9 @@ using Emgu.CV.Structure;
 
 namespace APO_Projekt
 {
+	/// <summary>
+	/// Main class holding an image and all the necessary forms and functions.
+	/// </summary>
 	public class Picture
 	{
 		private Bitmap img;
@@ -22,12 +25,13 @@ namespace APO_Projekt
 		private HistListForm histogramListDisplay = null;
 
 		private Dictionary<string, int[]> histogram; // 3 histograms: red, green, blue
-		private History history = new History();
+		private History history = new History(); // Undo / Redo
 
 		private bool isGreyscale = false;
 		private bool isModified = false;
 		private bool isCreated = false;
 
+		#region Constructors
 		public Picture(string filename)
 		{
 			this.img = new Bitmap(filename);
@@ -41,7 +45,11 @@ namespace APO_Projekt
 				isGreyscale = true;
 			}
 		}
-
+		/// <summary>
+		/// Copying constructor.
+		/// </summary>
+		/// <param name="image">New image.</param>
+		/// <param name="filename">Filename of old image to create a new name from.</param>
 		public Picture(Bitmap image, string filename)
 		{
 			this.img = new Bitmap(image);
@@ -56,9 +64,141 @@ namespace APO_Projekt
 				isGreyscale = true;
 			}
 		}
+		#endregion Constructors
 
-		//Functions
+		#region Functions
 
+		#region Show Form
+		public void ViewHistogram()
+		{
+			this.histogramDisplay = new HistForm(this);
+			this.histogramDisplay.Show();
+		}
+
+		public void ViewHistogramList()
+		{
+			this.histogramListDisplay = new HistListForm(this);
+			this.histogramListDisplay.Show();
+		}
+		#endregion Show Form
+
+		#region Close Form
+		/// <summary>
+		/// Executed when closing image window, closes all related windows.
+		/// </summary>
+		public void Close()
+		{
+			if (this.histogramDisplay != null)
+			{
+				this.histogramDisplay.Close();
+			}
+			if (this.histogramListDisplay != null)
+			{
+				this.histogramListDisplay.Close();
+			}
+			PictureList.All.Remove(Path);
+			if (PictureList.Focused == this)
+			{
+				PictureList.Focused = null;
+			}
+			this.img.Dispose();
+			this.imgCopy.Dispose();
+		}
+
+		public void CloseHistogram()
+		{
+			this.histogramDisplay = null;
+		}
+
+		public void CloseHistogramList()
+		{
+			this.histogramListDisplay = null;
+		}
+
+		#endregion Close Form
+
+		#region Undo/Redo
+
+		/// <summary>
+		/// Undos all made changes.
+		/// </summary>
+		public void Revert()
+		{
+			this.img = new Bitmap(this.imgCopy);
+			this.histogram = CalculateHistogram();
+			this.isModified = false;
+			if (this.imageDisplay != null)
+			{
+				this.imageDisplay.refresh();
+			}
+			if (this.histogramDisplay != null)
+			{
+				this.histogramDisplay.refresh();
+			}
+		}
+		public void Undo()
+		{
+			if (!history.UndoEmpty)
+			{
+				img = history.Undo(imgCopy);
+				imgCopy = new Bitmap(img);
+			}
+		}
+
+		public void Redo()
+		{
+			if (!history.RedoEmpty)
+			{
+				img = history.Redo(imgCopy);
+				imgCopy = new Bitmap(img);
+			}
+		}
+
+		#endregion Undo/Redo
+
+		#region Apply Changes
+
+		/// <summary>
+		/// Saves changed image and refreshes all related windows.
+		/// </summary>
+		/// <param name="newImg">Image to be saved.</param>
+		private void MakeChanges(Bitmap newImg)
+		{
+			this.img.Dispose();
+			this.img = new Bitmap(newImg);
+			this.isModified = true;
+			this.histogram = CalculateHistogram();
+
+			if (this.imageDisplay != null)
+			{
+				this.imageDisplay.refresh();
+			}
+
+			if (this.histogramDisplay != null)
+			{
+				this.histogramDisplay.refresh();
+			}
+
+			if (this.histogramListDisplay != null)
+			{
+				this.histogramListDisplay.refresh();
+			}
+			newImg.Dispose();
+		}
+		/// <summary>
+		/// Approves changes made to image, so you can make different changes to it, as well as to use undo operation.
+		/// </summary>
+		public void ApproveChanges()
+		{
+			history.Add(this.imgCopy);
+			this.imgCopy = new Bitmap(this.img);
+		}
+		#endregion Apply Changes
+
+		/// <summary>
+		/// Generates histogram for current image.
+		/// </summary>
+		/// <returns>3 histograms (int[256]) "red", "green", "blue".</returns>
 		private Dictionary<string, int[]> CalculateHistogram()
 		{
 			Dictionary<string, int[]> histogram = new Dictionary<string, int[]>()
@@ -78,7 +218,66 @@ namespace APO_Projekt
 			}
 			return histogram;
 		}
+		/// <summary>
+		/// Creates new file path based on file path of another file.
+		/// </summary>
+		/// <param name="path">File path of similar image.</param>
+		/// <returns>New filename</returns>
+		private string CreateNewFilename(string path)
+		{
+			int i = 1;
+			StringBuilder sb = new StringBuilder();
+			sb.Append(System.IO.Path.GetDirectoryName(path));
+			sb.Append("\\");
+			sb.Append(System.IO.Path.GetFileNameWithoutExtension(path));
+			while (PictureList.All.ContainsKey(sb.ToString() + "(" + i + ")" + System.IO.Path.GetExtension(path)))
+			{
+				i++;
+			}
+			sb.Append("(" + i + ")");
+			sb.Append(System.IO.Path.GetExtension(path));
+			return sb.ToString();
+		}
+		/// <summary>
+		/// Save image to file. It will update the filename of the class.
+		/// </summary>
+		/// <param name="filename">File path where the image is saved.</param>
+		public void Save(string filename)
+		{
+			Bitmap bitmap = new Bitmap(this.img);
+			this.img.Dispose();
+			this.imgCopy.Dispose();
+			if (System.IO.File.Exists(filename))
+			{
+				System.IO.File.Delete(filename);
+			}
+			bitmap.Save(filename);
+			this.img = new Bitmap(bitmap);
+			this.imgCopy = new Bitmap(bitmap);
+			bitmap.Dispose();
+			if (this.filename != filename)
+			{
+				PictureList.All.Remove(this.filename);
+				this.filename = filename;
+				PictureList.All.Add(this.filename, this);
+			}
+			this.isModified = false;
+			this.isCreated = false;
+			this.imageDisplay.changeName();
+			if (this.histogramDisplay != null)
+			{
+				this.histogramDisplay.changeName();
+			}
+			if (this.histogramListDisplay != null)
+			{
+				this.histogramListDisplay.changeName();
+			}
+		}
+		#endregion Functions
 
+		#region Image Modification
+
+		#region Histogram
 		private int HistogramMinValue(int[] histogram)
 		{
 			int minValue = 0;
@@ -174,7 +373,29 @@ namespace APO_Projekt
 			MakeChanges(newImg);
 			ApproveChanges();
 		}
+		public void RecoverFragment(int min, int max)
+		{
+			Image<Gray, Byte> image = Img.ToImage<Gray, Byte>();
+			Bitmap NewImg = new Bitmap(Img.Width, Img.Height);
+			for (int i = 0; i < Img.Width; ++i)
+			{
+				for (int j = 0; j < Img.Height; ++j)
+				{
+					int pixel = (int)image[j, i].Intensity;
+					Color newpixel = Color.FromArgb(0, 0, 0);
+					if (min < pixel && pixel < max)
+					{
+						newpixel = Color.FromArgb(255, 255, 255);
+					}
+					NewImg.SetPixel(i, j, newpixel);
+				}
+			}
+			MakeChanges(NewImg);
+			ApproveChanges();
+		}
+		#endregion Histogram
 
+		#region Point Operations
 		public void Negation()
 		{
 			Bitmap newImg = new Bitmap(Img.Width, Img.Height);
@@ -189,84 +410,6 @@ namespace APO_Projekt
 			}
 			MakeChanges(newImg);
 			ApproveChanges();
-		}
-
-		public static Picture BitwiseAND(Picture picture1, Picture picture2)
-		{
-			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
-			Image<Bgr, Byte> img1 = picture1.Img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> img2 = picture2.Img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(img1.Size);
-			CvInvoke.BitwiseAnd(img1, img2, newImg);
-			return new Picture(newImg.ToBitmap(), picture1.Path);
-		}
-
-		public static Picture BitwiseOR(Picture picture1, Picture picture2)
-		{
-			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
-			Image<Bgr, Byte> img1 = picture1.Img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> img2 = picture2.Img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(img1.Size);
-			CvInvoke.BitwiseOr(img1, img2, newImg);
-			return new Picture(newImg.ToBitmap(), picture1.Path);
-		}
-
-		public static Picture BitwiseXOR(Picture picture1, Picture picture2)
-		{
-			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
-			Image<Bgr, Byte> img1 = picture1.Img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> img2 = picture2.Img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(img1.Size);
-			CvInvoke.BitwiseXor(img1, img2, newImg);
-			return new Picture(newImg.ToBitmap(), picture1.Path);
-		}
-
-		public static Picture Add(Picture picture1, Picture picture2)
-		{
-			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
-			Size size = new Size(picture1.Img.Size.Width, picture1.Img.Size.Height);
-			Bitmap newImg = new Bitmap(size.Width, size.Height);
-			for (int x = 0; x < size.Width; ++x)
-			{
-				for (int y = 0; y < size.Height; ++y)
-				{
-					Color pixel1 = picture1.Img.GetPixel(x, y);
-					Color pixel2 = picture2.Img.GetPixel(x, y);
-					int red = pixel1.R + pixel2.R;
-					if(red > 255) red = 255;
-					int green = pixel1.G + pixel2.G;
-					if (green > 255) green = 255;
-					int blue = pixel1.B + pixel2.B;
-					if (blue > 255) blue = 255;
-					Color newpixel = Color.FromArgb(red, green, blue);
-					newImg.SetPixel(x, y, newpixel);
-				}
-			}
-			return new Picture(newImg, picture1.Path);
-		}
-
-		public static Picture Substract(Picture picture1, Picture picture2)
-		{
-			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
-			Size size = new Size(picture1.Img.Size.Width, picture1.Img.Size.Height);
-			Bitmap newImg = new Bitmap(size.Width, size.Height);
-			for (int x = 0; x < size.Width; ++x)
-			{
-				for (int y = 0; y < size.Height; ++y)
-				{
-					Color pixel1 = picture1.Img.GetPixel(x, y);
-					Color pixel2 = picture2.Img.GetPixel(x, y);
-					int red = pixel1.R - pixel2.R;
-					if (red < 0) red = 0;
-					int green = pixel1.G - pixel2.G;
-					if (green < 0) green = 0;
-					int blue = pixel1.B - pixel2.B;
-					if (blue < 0) blue = 0;
-					Color newpixel = Color.FromArgb(red, green, blue);
-					newImg.SetPixel(x, y, newpixel);
-				}
-			}
-			return new Picture(newImg, picture1.Path);
 		}
 
 		public void Thresholding(int threshold)
@@ -324,15 +467,14 @@ namespace APO_Projekt
 			}
 			MakeChanges(newImg);
 		}
-
 		public void AdaptiveThresholding(int size)
 		{
 			Image<Bgr, Byte> imgCV = Img.ToImage<Bgr, byte>();
 			Image<Bgr, Byte> newImg;
-			newImg = imgCV.ThresholdAdaptive(new Bgr(255, 255, 255), Emgu.CV.CvEnum.AdaptiveThresholdType.MeanC, Emgu.CV.CvEnum.ThresholdType.Binary, size, new Bgr(5,5,5));
+			newImg = imgCV.ThresholdAdaptive(new Bgr(255, 255, 255), Emgu.CV.CvEnum.AdaptiveThresholdType.MeanC, Emgu.CV.CvEnum.ThresholdType.Binary, size, new Bgr(5, 5, 5));
 			MakeChanges(newImg.ToBitmap());
 		}
-		
+
 		public void OtsuThresholding()
 		{
 			this.GaussianBlur(5);
@@ -342,7 +484,85 @@ namespace APO_Projekt
 			MakeChanges(newImg.ToBitmap());
 			ApproveChanges();
 		}
-		
+		public static Picture Add(Picture picture1, Picture picture2)
+		{
+			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
+			Size size = new Size(picture1.Img.Size.Width, picture1.Img.Size.Height);
+			Bitmap newImg = new Bitmap(size.Width, size.Height);
+			for (int x = 0; x < size.Width; ++x)
+			{
+				for (int y = 0; y < size.Height; ++y)
+				{
+					Color pixel1 = picture1.Img.GetPixel(x, y);
+					Color pixel2 = picture2.Img.GetPixel(x, y);
+					int red = pixel1.R + pixel2.R;
+					if (red > 255) red = 255;
+					int green = pixel1.G + pixel2.G;
+					if (green > 255) green = 255;
+					int blue = pixel1.B + pixel2.B;
+					if (blue > 255) blue = 255;
+					Color newpixel = Color.FromArgb(red, green, blue);
+					newImg.SetPixel(x, y, newpixel);
+				}
+			}
+			return new Picture(newImg, picture1.Path);
+		}
+
+		public static Picture Substract(Picture picture1, Picture picture2)
+		{
+			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
+			Size size = new Size(picture1.Img.Size.Width, picture1.Img.Size.Height);
+			Bitmap newImg = new Bitmap(size.Width, size.Height);
+			for (int x = 0; x < size.Width; ++x)
+			{
+				for (int y = 0; y < size.Height; ++y)
+				{
+					Color pixel1 = picture1.Img.GetPixel(x, y);
+					Color pixel2 = picture2.Img.GetPixel(x, y);
+					int red = pixel1.R - pixel2.R;
+					if (red < 0) red = 0;
+					int green = pixel1.G - pixel2.G;
+					if (green < 0) green = 0;
+					int blue = pixel1.B - pixel2.B;
+					if (blue < 0) blue = 0;
+					Color newpixel = Color.FromArgb(red, green, blue);
+					newImg.SetPixel(x, y, newpixel);
+				}
+			}
+			return new Picture(newImg, picture1.Path);
+		}
+		public static Picture BitwiseAND(Picture picture1, Picture picture2)
+		{
+			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
+			Image<Bgr, Byte> img1 = picture1.Img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> img2 = picture2.Img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(img1.Size);
+			CvInvoke.BitwiseAnd(img1, img2, newImg);
+			return new Picture(newImg.ToBitmap(), picture1.Path);
+		}
+
+		public static Picture BitwiseOR(Picture picture1, Picture picture2)
+		{
+			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
+			Image<Bgr, Byte> img1 = picture1.Img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> img2 = picture2.Img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(img1.Size);
+			CvInvoke.BitwiseOr(img1, img2, newImg);
+			return new Picture(newImg.ToBitmap(), picture1.Path);
+		}
+
+		public static Picture BitwiseXOR(Picture picture1, Picture picture2)
+		{
+			if (picture1.Img.Size != picture2.Img.Size) throw new ArgumentException("Pictures are in different size.");
+			Image<Bgr, Byte> img1 = picture1.Img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> img2 = picture2.Img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(img1.Size);
+			CvInvoke.BitwiseXor(img1, img2, newImg);
+			return new Picture(newImg.ToBitmap(), picture1.Path);
+		}
+		#endregion Point Operations
+
+		#region Neighbor Operations
 		public void Blur(int size)
 		{
 			Point point = new Point(-1, -1);
@@ -356,10 +576,17 @@ namespace APO_Projekt
 		{
 			Image<Bgr, Byte> imgCV = Img.ToImage<Bgr, Byte>();
 			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(imgCV.Size);
-			CvInvoke.GaussianBlur(imgCV, newImg, new Size(size,size), 0);
+			CvInvoke.GaussianBlur(imgCV, newImg, new Size(size, size), 0);
 			MakeChanges(newImg.ToBitmap());
 		}
-		
+
+		public void MedianBlur(int filterSize)
+		{
+			Image<Bgr, Byte> imgCV = img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(imgCV.Size);
+			CvInvoke.MedianBlur(imgCV, newImg, filterSize);
+			MakeChanges(newImg.ToBitmap());
+		}
 		public void Laplacian()
 		{
 			Image<Bgr, double> imgCV = img.ToImage<Bgr, double>();
@@ -386,236 +613,12 @@ namespace APO_Projekt
 			MakeChanges(newImg.ToBitmap());
 			ApproveChanges();
 		}
-
-		public void MedianBlur(int filterSize)
-		{
-			Image<Bgr, Byte> imgCV = img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(imgCV.Size);
-			CvInvoke.MedianBlur(imgCV, newImg, filterSize);
-			MakeChanges(newImg.ToBitmap());
-		}
-		public void Morphology(Emgu.CV.CvEnum.MorphOp morphOp, Emgu.CV.CvEnum.ElementShape elementShape, Emgu.CV.CvEnum.BorderType borderType, int size )
-		{
-			Size s = new Size(size, size);
-			Point p = new Point(-1, -1);
-			Mat kernel = CvInvoke.GetStructuringElement(elementShape, s, p);
-			Image<Bgr, Byte> imgCV = img.ToImage<Bgr, Byte>();
-			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(imgCV.Size);
-			CvInvoke.MorphologyEx(imgCV,newImg,morphOp,kernel,p,1,borderType,new MCvScalar());
-			MakeChanges(newImg.ToBitmap());
-		}
-
 		public void Filtration(IInputArray kernel)
 		{
 			Image<Bgr, Byte> imgCV = img.ToImage<Bgr, Byte>();
 			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(imgCV.Size);
 			CvInvoke.Filter2D(imgCV, newImg, kernel, new Point(-1, -1), 0, Emgu.CV.CvEnum.BorderType.Replicate);
 			MakeChanges(newImg.ToBitmap());
-		}
-
-		public void Skeletization()
-		{
-			Image<Gray, Byte> imgCV = img.ToImage<Gray, Byte>();
-			Image<Gray, Byte> skel = new Image<Gray, byte>(imgCV.Size);
-			skel.SetZero();
-			Point anchor = new Point(-1, -1);
-			Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross,new Size(3,3),anchor);
-			Image<Gray, Byte> imgTemp = new Image<Gray, byte>(imgCV.Size);
-			Image<Gray, Byte> imgEroded = new Image<Gray, byte>(imgCV.Size);
-			Image<Gray, Byte> imgOpen = new Image<Gray, byte>(imgCV.Size);
-			do
-			{
-				imgOpen = imgCV.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Open, kernel, anchor, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
-				CvInvoke.Subtract(imgCV, imgOpen, imgTemp);
-				CvInvoke.Erode(imgCV, imgEroded, kernel, anchor, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
-				CvInvoke.BitwiseOr(skel, imgTemp, skel);
-				imgCV = imgEroded.Copy();
-			} while (CvInvoke.CountNonZero(imgCV) == 0);
-			MakeChanges(skel.ToBitmap());
-		}
-
-		public void Watershed()
-		{
-			Image<Gray, byte> imgCV = img.ToImage<Gray, byte>();
-			Image<Gray, byte> imgThresh = new Image<Gray, byte>(imgCV.Size);
-			Matrix<float> kernel = new Matrix<float>(new float[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-			Point p = new Point(-1, -1);
-			CvInvoke.Threshold(imgCV, imgThresh, 0, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv | Emgu.CV.CvEnum.ThresholdType.Otsu);
-			Image<Gray, byte> imgOpen = new Image<Gray, byte>(imgCV.Size);
-			CvInvoke.MorphologyEx(imgThresh, imgOpen, Emgu.CV.CvEnum.MorphOp.Open, kernel, p, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
-			Image<Gray, byte> sureBG = new Image<Gray, byte>(imgCV.Size);
-			CvInvoke.Dilate(imgOpen, sureBG, kernel, p, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
-			Image<Gray, float> dist_transform = new Image<Gray, float>(imgCV.Size);
-			CvInvoke.DistanceTransform(imgOpen, dist_transform, null, Emgu.CV.CvEnum.DistType.L2,5);
-			MakeChanges(dist_transform.ToBitmap());
-			Image<Gray, sbyte> sureFG = new Image<Gray, sbyte>(imgCV.Size);
-			CvInvoke.Threshold(dist_transform, sureFG, 0.5 * HistogramMaxValue(RedHistogram), 255, Emgu.CV.CvEnum.ThresholdType.Binary);
-			Image<Gray, byte> result = new Image<Gray, byte>(imgCV.Size);
-			CvInvoke.Subtract(sureBG, sureFG, result, null, Emgu.CV.CvEnum.DepthType.Cv8U);
-			Image<Gray, sbyte> markers = new Image<Gray, sbyte>(imgCV.Size);
-			//int components = CvInvoke.ConnectedComponents(sureFG, markers);
-			MakeChanges(result.ToBitmap());
-			//TODO
-		}
-		// Display
-
-		public void ViewHistogram()
-		{
-			this.histogramDisplay = new HistForm(this);
-			this.histogramDisplay.Show();
-		}
-
-		public void ViewHistogramList()
-		{
-			this.histogramListDisplay = new HistListForm(this);
-			this.histogramListDisplay.Show();
-		}
-		public void Undo()
-		{
-			if(!history.UndoEmpty)
-			{
-				img = history.Undo(imgCopy);
-				imgCopy = new Bitmap(img);
-			}
-		}
-
-		public void Redo()
-		{
-			if(!history.RedoEmpty)
-			{
-				img = history.Redo(imgCopy);
-				imgCopy = new Bitmap(img);
-			}
-		}
-		/// <summary>
-		/// Undos all made changes.
-		/// </summary>
-		public void Revert()
-		{
-			this.img = new Bitmap(this.imgCopy);
-			this.histogram = CalculateHistogram();
-			this.isModified = false;
-			if (this.imageDisplay != null)
-			{
-				this.imageDisplay.refresh();
-			}
-			if (this.histogramDisplay != null)
-			{
-				this.histogramDisplay.refresh();
-			}
-		}
-		/// <summary>
-		/// Executed when closing image window, closes all related windows.
-		/// </summary>
-		public void Close()
-		{
-			if(this.histogramDisplay != null)
-			{
-				this.histogramDisplay.Close();
-			}
-			if(this.histogramListDisplay != null)
-			{
-				this.histogramListDisplay.Close();
-			}
-			PictureList.All.Remove(Path);
-			if(PictureList.Focused == this)
-			{
-				PictureList.Focused = null;
-			}
-			this.img.Dispose();
-			this.imgCopy.Dispose();
-		}
-
-		public void CloseHistogram()
-		{
-			this.histogramDisplay = null;
-		}
-
-		public void CloseHistogramList()
-		{
-			this.histogramListDisplay = null;
-		}
-		/// <summary>
-		/// Saves changed image and refreshes all related windows.
-		/// </summary>
-		/// <param name="newImg">Image to be saved.</param>
-		private void MakeChanges(Bitmap newImg)
-		{
-			this.img.Dispose();
-			this.img = new Bitmap(newImg);
-			this.isModified = true;
-			this.histogram = CalculateHistogram();
-
-			if (this.imageDisplay != null)
-			{
-				this.imageDisplay.refresh();
-			}
-
-			if (this.histogramDisplay != null)
-			{
-				this.histogramDisplay.refresh();
-			}
-
-			if (this.histogramListDisplay != null)
-			{
-				this.histogramListDisplay.refresh();
-			}
-			newImg.Dispose();
-		}
-		/// <summary>
-		/// Approves changes made to image, so you can make different changes to it, as well as to use undo operation.
-		/// </summary>
-		public void ApproveChanges()
-		{
-			history.Add(this.imgCopy);
-			this.imgCopy = new Bitmap(this.img);
-		}
-		private string CreateNewFilename(string path)
-		{
-			int i = 1;
-			StringBuilder sb = new StringBuilder();
-			sb.Append(System.IO.Path.GetDirectoryName(path));
-			sb.Append("\\");
-			sb.Append(System.IO.Path.GetFileNameWithoutExtension(path));
-			while(PictureList.All.ContainsKey(sb.ToString()+"("+i+")"+System.IO.Path.GetExtension(path)))
-			{
-				i++;
-			}
-			sb.Append("(" + i + ")");
-			sb.Append(System.IO.Path.GetExtension(path));
-			return sb.ToString();
-		}
-
-		public void Save(string filename)
-		{
-			Bitmap bitmap = new Bitmap(this.img);
-			this.img.Dispose();
-			this.imgCopy.Dispose();
-			if(System.IO.File.Exists(filename))
-			{
-				System.IO.File.Delete(filename);
-			}
-			bitmap.Save(filename);
-			this.img = new Bitmap(bitmap);
-			this.imgCopy = new Bitmap(bitmap);
-			bitmap.Dispose();
-			if(this.filename != filename)
-			{
-				PictureList.All.Remove(this.filename);
-				this.filename = filename;
-				PictureList.All.Add(this.filename, this);
-			}
-			this.isModified = false;
-			this.isCreated = false;
-			this.imageDisplay.changeName();
-			if(this.histogramDisplay != null)
-			{
-				this.histogramDisplay.changeName();
-			}
-			if (this.histogramListDisplay != null)
-			{
-				this.histogramListDisplay.changeName();
-			}
 		}
 		public void LogicFiltration(LogicWindowType logicWindowType)
 		{
@@ -632,7 +635,7 @@ namespace APO_Projekt
 							{
 								window[0] = image[i, j - 1];
 								window[1] = image[i, j + 1];
-								if(window[0].Intensity == window[1].Intensity)
+								if (window[0].Intensity == window[1].Intensity)
 								{
 									image[i, j] = window[0];
 								}
@@ -668,7 +671,7 @@ namespace APO_Projekt
 								window[1] = image[i, j + 1];
 								window[2] = image[i + 1, j];
 								window[3] = image[i, j - 1];
-								if( (window[0].Intensity == window[1].Intensity) && (window[0].Intensity == window[2].Intensity) && (window[0].Intensity == window[3].Intensity))
+								if ((window[0].Intensity == window[1].Intensity) && (window[0].Intensity == window[2].Intensity) && (window[0].Intensity == window[3].Intensity))
 								{
 									image[i, j] = window[0];
 								}
@@ -679,193 +682,68 @@ namespace APO_Projekt
 			}
 			MakeChanges(image.ToBitmap());
 		}
-		/*public void LogicFiltration(LogicOperationType logicOperationType, LogicWindowType logicWindowType)
+		#endregion Neighbor Operations
+
+		#region Morphology
+		public void Morphology(Emgu.CV.CvEnum.MorphOp morphOp, Emgu.CV.CvEnum.ElementShape elementShape, Emgu.CV.CvEnum.BorderType borderType, int size)
 		{
-			Image<Gray, Byte> image = Img.ToImage<Gray,Byte>();
-			image = image.ThresholdBinary(new Gray(127), new Gray(255));
-			int[] window;
-			switch(logicWindowType)
-			{
-				case LogicWindowType.Horizontal:
-					{
-						window = new int[3];
-						for(int i = 0; i < image.Height; ++i)
-						{
-							for(int j = 1; j < image.Width - 1;++j)
-							{
-								window[0] = (int)image[j - 1, i].Intensity;
-								window[1] = (int)image[j, i].Intensity;
-								window[2] = (int)image[j + 1, i].Intensity;
-								window = logicOperation(window, logicOperationType);
-								image[j, i] = new Gray(window[1]);
-							}
-						}
-						break;
-					}
-				case LogicWindowType.Vertical:
-					{
-						window = new int[3];
-						for (int i = 1; i < image.Height - 1; ++i)
-						{
-							for (int j = 0; j < image.Width; ++j)
-							{
-								window[0] = (int)image[j, i - 1].Intensity;
-								window[1] = (int)image[j, i].Intensity;
-								window[2] = (int)image[j, i + 1].Intensity;
-								window = logicOperation(window, logicOperationType);
-								image[j, i] = new Gray(window[1]);
-							}
-						}
-						break;
-					}
-				case LogicWindowType.Star:
-				{
-						window = new int[9];
-						for (int i = 1; i < image.Height - 1; ++i)
-						{
-							for (int j = 1; j < image.Width - 1; ++j)
-							{
-								window[1] = (int)image[j, i - 1].Intensity;
-								window[3] = (int)image[j - 1, i].Intensity;
-								window[4] = (int)image[j, i].Intensity;
-								window[5] = (int)image[j + 1, i].Intensity;
-								window[7] = (int)image[j, i + 1].Intensity;
-								window = logicOperationStar(window, logicOperationType);
-								image[j, i] = new Gray(window[4]);
-							}
-						}
-						break;
-				}
-			}
-			MakeChanges(image.ToBitmap());
+			Size s = new Size(size, size);
+			Point p = new Point(-1, -1);
+			Mat kernel = CvInvoke.GetStructuringElement(elementShape, s, p);
+			Image<Bgr, Byte> imgCV = img.ToImage<Bgr, Byte>();
+			Image<Bgr, Byte> newImg = new Image<Bgr, byte>(imgCV.Size);
+			CvInvoke.MorphologyEx(imgCV, newImg, morphOp, kernel, p, 1, borderType, new MCvScalar());
+			MakeChanges(newImg.ToBitmap());
 		}
-		private int[] logicOperationStar(int[] window, LogicOperationType logicOperationType)
+		public void Skeletization()//TODO
 		{
-			bool a = Convert.ToBoolean(window[3]);
-			bool b = Convert.ToBoolean(window[1]);
-			bool c = Convert.ToBoolean(window[5]);
-			bool d = Convert.ToBoolean(window[7]);
-			switch (logicOperationType)
+			Image<Gray, Byte> imgCV = img.ToImage<Gray, Byte>();
+			Image<Gray, Byte> skel = new Image<Gray, byte>(imgCV.Size);
+			skel.SetZero();
+			Point anchor = new Point(-1, -1);
+			Mat kernel = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new Size(3, 3), anchor);
+			Image<Gray, Byte> imgTemp = new Image<Gray, byte>(imgCV.Size);
+			Image<Gray, Byte> imgEroded = new Image<Gray, byte>(imgCV.Size);
+			Image<Gray, Byte> imgOpen = new Image<Gray, byte>(imgCV.Size);
+			do
 			{
-				case LogicOperationType.AND:
-					{
-						if (a && b && c && d)
-						{
-							window[4] = window[3];
-						}
-						break;
-					}
-				case LogicOperationType.OR:
-					{
-						if (a || b || c || d)
-						{
-							window[4] = window[3];
-						}
-						break;
-					}
-				case LogicOperationType.NOT:
-					{
-						if ((a != b) && (a != c) && (a != d))
-						{
-							window[4] = window[3];
-						}
-						break;
-					}
-				case LogicOperationType.XOR:
-					{
-						if (a ^ b ^ c ^ d)
-						{
-							window[4] = window[3];
-						}
-						break;
-					}
-				case LogicOperationType.NXOR:
-					{
-						if (!(a ^ b) && !(a ^ c) && !(a ^ d))
-						{
-							window[4] = window[3];
-						}
-						break;
-					}
-				default:
-					throw new ArgumentNullException();
-			}
-			return window;
-		}
-		private int[] logicOperation(int[] window, LogicOperationType logicOperationType)
-		{
-			bool a = Convert.ToBoolean(window[0]);
-			bool b = Convert.ToBoolean(window[2]);
-			switch (logicOperationType)
-			{
-				case LogicOperationType.AND:
-					{
-						if (a && b)
-						{
-							window[1] = window[0];
-						}
-						break;
-					}
-				case LogicOperationType.OR:
-					{
-						if (a || b)
-						{
-							window[1] = window[0];
-						}
-						break;
-					}
-				case LogicOperationType.NOT:
-					{
-						if (a != b)
-						{
-							window[1] = window[0];
-						}
-						break;
-					}
-				case LogicOperationType.XOR:
-					{
-						if (a ^ b)
-						{
-							window[1] = window[0];
-						}
-						break;
-					}
-				case LogicOperationType.NXOR:
-					{
-						if (!(a ^ b))
-						{
-							window[1] = window[0];
-						}
-						break;
-					}
-				default:
-					throw new ArgumentNullException();
-			}
-			return window;
-		}
-		*/
-		public void RecoverFragment(int min, int max)
-		{
-			Image<Gray, Byte> image = Img.ToImage<Gray, Byte>();
-			Bitmap NewImg = new Bitmap(Img.Width, Img.Height);
-			for (int i = 0; i < Img.Width; ++i)
-			{
-				for (int j = 0; j < Img.Height; ++j)
-				{
-					int pixel = (int)image[j, i].Intensity;
-					Color newpixel = Color.FromArgb(0, 0, 0);
-					if (min < pixel && pixel < max)
-					{
-						newpixel = Color.FromArgb(255, 255, 255);
-					}
-					NewImg.SetPixel(i, j, newpixel);
-				}
-			}
-			MakeChanges(NewImg);
-			ApproveChanges();
+				imgOpen = imgCV.MorphologyEx(Emgu.CV.CvEnum.MorphOp.Open, kernel, anchor, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
+				CvInvoke.Subtract(imgCV, imgOpen, imgTemp);
+				CvInvoke.Erode(imgCV, imgEroded, kernel, anchor, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
+				CvInvoke.BitwiseOr(skel, imgTemp, skel);
+				imgCV = imgEroded.Copy();
+			} while (CvInvoke.CountNonZero(imgCV) == 0);
+			MakeChanges(skel.ToBitmap());
 		}
 
-		// Getters
+		public void Watershed()//TODO
+		{
+			Image<Gray, byte> imgCV = img.ToImage<Gray, byte>();
+			Image<Gray, byte> imgThresh = new Image<Gray, byte>(imgCV.Size);
+			Matrix<float> kernel = new Matrix<float>(new float[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+			Point p = new Point(-1, -1);
+			CvInvoke.Threshold(imgCV, imgThresh, 0, 255, Emgu.CV.CvEnum.ThresholdType.BinaryInv | Emgu.CV.CvEnum.ThresholdType.Otsu);
+			Image<Gray, byte> imgOpen = new Image<Gray, byte>(imgCV.Size);
+			CvInvoke.MorphologyEx(imgThresh, imgOpen, Emgu.CV.CvEnum.MorphOp.Open, kernel, p, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
+			Image<Gray, byte> sureBG = new Image<Gray, byte>(imgCV.Size);
+			CvInvoke.Dilate(imgOpen, sureBG, kernel, p, 1, Emgu.CV.CvEnum.BorderType.Replicate, new MCvScalar());
+			Image<Gray, float> dist_transform = new Image<Gray, float>(imgCV.Size);
+			CvInvoke.DistanceTransform(imgOpen, dist_transform, null, Emgu.CV.CvEnum.DistType.L2, 5);
+			MakeChanges(dist_transform.ToBitmap());
+			Image<Gray, sbyte> sureFG = new Image<Gray, sbyte>(imgCV.Size);
+			CvInvoke.Threshold(dist_transform, sureFG, 0.5 * HistogramMaxValue(RedHistogram), 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+			Image<Gray, byte> result = new Image<Gray, byte>(imgCV.Size);
+			CvInvoke.Subtract(sureBG, sureFG, result, null, Emgu.CV.CvEnum.DepthType.Cv8U);
+			Image<Gray, sbyte> markers = new Image<Gray, sbyte>(imgCV.Size);
+			//int components = CvInvoke.ConnectedComponents(sureFG, markers);
+			MakeChanges(result.ToBitmap());
+			//TODO
+		}
+		#endregion Morphology
+
+		#endregion Image Modification
+
+		#region Getters
 
 		public Bitmap Img
 		{
@@ -908,5 +786,7 @@ namespace APO_Projekt
 		{
 			get { return System.IO.Path.GetExtension(this.filename); }
 		}
+		#endregion Getters
+
 	}
 }
