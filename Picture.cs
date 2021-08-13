@@ -786,6 +786,10 @@ namespace APO_Projekt
 		{
 			get { return System.IO.Path.GetExtension(this.filename); }
 		}
+
+		// Author: Drekurion
+		// Image Processing Application - Main Class
+
 		#endregion Getters
 
 	}

@@ -11,6 +11,9 @@ using System.Windows.Forms;
 
 namespace APO_Projekt
 {
+	/// <summary>
+	/// Form being a main window of the program, allowing to use all functionalities of it. Contains only a toolbar mainly with references to functions from Picture class.
+	/// </summary>
 	public partial class MainForm : Form
 	{
 		public MainForm()
@@ -348,7 +351,7 @@ namespace APO_Projekt
 
 		private void informacjaToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			MessageBox.Show("Tytuł projektu:\nAutor: Dariusz Woźniak\nProwadzący:mgr inż. Łukasz Roszkowiak\nAlgorytmy Przetwarzania Obrazów 2021\nWIT grupa ID06IO2.", "Aplikacja zbiorcza z ćwiczeń laboratoryjnych i projektu.");
+			MessageBox.Show("Image Processing Application\nAuthor: Drekurion\nProject made for Image Processing Algorithms in 2021 on WSISIZ(WIT).\n");
 		}
 	}
 }

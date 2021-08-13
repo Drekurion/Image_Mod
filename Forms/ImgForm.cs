@@ -10,6 +10,9 @@ using System.Windows.Forms;
 
 namespace APO_Projekt
 {
+    /// <summary>
+    /// Form for displaying an image in the application. Docked to Picture class.
+    /// </summary>
 	public partial class ImgForm : Form
 	{
         private Picture handle;

@@ -13,6 +13,9 @@ using Emgu.CV.Structure;
 
 namespace APO_Projekt
 {
+	/// <summary>
+	/// Form for showing data of different objects on the image.
+	/// </summary>
 	public partial class AnalizeForm : Form
 	{
 		private Picture handle;

@@ -10,6 +10,9 @@ using System.Windows.Forms;
 
 namespace APO_Projekt
 {
+	/// <summary>
+	/// Form for displaying histogram in list mode. Docked to Picture Class.
+	/// </summary>
 	public partial class HistListForm : Form
 	{
 		private Picture handle;
